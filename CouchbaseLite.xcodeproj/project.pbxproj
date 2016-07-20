@@ -6541,6 +6541,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = CouchbaseLite;
 				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = NO;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos appletvos appletvsimulator";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = framework;
@@ -6565,6 +6566,7 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_NAME = CouchbaseLite;
 				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = NO;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos appletvos appletvsimulator";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = framework;
