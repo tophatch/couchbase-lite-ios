@@ -111,10 +111,10 @@ using namespace couchbase::differ;
             _changedIndexesAfter = changesAfter;
             _insertedIndexes = insertions;
             _modifiedIndexes = d.modifiedIndexes;
-            NSLog(@"CBLArrayDiff: %lu deleted, %lu replaced, %lu inserted, %lu moved, %lu modified",
-                  (unsigned long)deletions.count, (unsigned long)changesBefore.count,
-                  (unsigned long)insertions.count, _moves.size(), _modifiedIndexes.size());
-            std::cerr << changeVector << "\n";
+//            NSLog(@"CBLArrayDiff: %lu deleted, %lu replaced, %lu inserted, %lu moved, %lu modified",
+//                  (unsigned long)deletions.count, (unsigned long)changesBefore.count,
+//                  (unsigned long)insertions.count, _moves.size(), _modifiedIndexes.size());
+//            std::cerr << changeVector << "\n";
         } catch (const std::exception &x) {
             NSLog(@"ERROR: CBLArrayDiff failed with C++ exception: %s", x.what());
             return nil;
