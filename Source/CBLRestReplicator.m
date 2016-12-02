@@ -720,6 +720,8 @@ static NSString* const kSyncGatewayServerHeaderPrefix = @"Couchbase Sync Gateway
                       LogTo(Sync, @"%@: Error fetching last sequence: %@",
                             self, error.my_compactDescription);
                       self.error = error;
+                  } else if (!_online) {
+                      LogTo(Sync, @"%@: Offline, remote checkpoint will be ignored", self);
                   } else {
                       if (error.code == kCBLStatusNotFound)
                           [self maybeCreateRemoteDB];
