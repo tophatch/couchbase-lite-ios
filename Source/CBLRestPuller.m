@@ -170,6 +170,7 @@
     // This is called if I've gone idle but some revisions failed to be pulled.
     // I should start the _changes feed over again, so I can retry all the revisions.
     [_changeTracker stop];
+    Assert(!_changeTracker);
     [super retry];
 }
 
@@ -195,9 +196,12 @@
 
 
 - (BOOL) goOffline {
-    if (![super goOffline])
+    if (![super goOffline]) {
+        Assert(!_changeTracker);
         return NO;
+    }
     [_changeTracker stop];
+    Assert(!_changeTracker);
     return YES;
 }
 
