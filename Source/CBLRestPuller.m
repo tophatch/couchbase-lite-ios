@@ -197,7 +197,6 @@
 
 - (BOOL) goOffline {
     if (![super goOffline]) {
-        Assert(!_changeTracker);
         return NO;
     }
     [_changeTracker stop];
