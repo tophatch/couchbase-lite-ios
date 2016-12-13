@@ -585,6 +585,8 @@ static NSString* const kSyncGatewayServerHeaderPrefix = @"Couchbase Sync Gateway
 
 
 - (void) login {
+    Assert(_online);
+
     if (_settings.authorizer) {
         [self asyncTaskStarted];
         CBLRemoteLogin* login = [[CBLRemoteLogin alloc] initWithURL: _settings.remote
@@ -595,6 +597,10 @@ static NSString* const kSyncGatewayServerHeaderPrefix = @"Couchbase Sync Gateway
         {
             if (error) {
                 LogTo(Sync, @"%@: Login error: %@", self, error.my_compactDescription);
+                self.error = error;
+            } else if (!_online) { //just in case there is no error
+                LogTo(Sync, @"%@: Connection lost during login", self);
+                NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCancelled userInfo:nil];
                 self.error = error;
             } else {
                 LogTo(Sync, @"%@: Successfully logged in!", self);
@@ -696,6 +702,8 @@ static NSString* const kSyncGatewayServerHeaderPrefix = @"Couchbase Sync Gateway
 
 
 - (void) fetchRemoteCheckpointDoc {
+    Assert(_online);
+
     _lastSequenceChanged = NO;
     NSString* checkpointID = self.remoteCheckpointDocID;
     NSString* localLastSequence = [_db lastSequenceWithCheckpointID: checkpointID];
@@ -721,7 +729,7 @@ static NSString* const kSyncGatewayServerHeaderPrefix = @"Couchbase Sync Gateway
                             self, error.my_compactDescription);
                       self.error = error;
                   } else if (!_online) {
-                      LogTo(Sync, @"%@: Offline, remote checkpoint will be ignored", self);
+                      LogTo(Sync, @"%@: Connection lost while getting remote checkpoint", self);
                   } else {
                       if (error.code == kCBLStatusNotFound)
                           [self maybeCreateRemoteDB];
