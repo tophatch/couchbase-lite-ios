@@ -421,6 +421,8 @@ static NSString* const kSyncGatewayServerHeaderPrefix = @"Couchbase Sync Gateway
         _lastSequence = nil;
         self.error = nil;
 
+        [NSObject cancelPreviousPerformRequestsWithTarget: self
+                                                 selector: @selector(retryIfReady) object: nil];
         [self login];
         [self postProgressChanged];
     }
