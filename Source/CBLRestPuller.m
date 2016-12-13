@@ -167,11 +167,17 @@
 
 
 - (void) retry {
+    // Start an async task to make sure the replicator doesn't go offline after
+    // stopping the change tracker.
+    [self asyncTaskStarted];
+
     // This is called if I've gone idle but some revisions failed to be pulled.
     // I should start the _changes feed over again, so I can retry all the revisions.
     [_changeTracker stop];
     Assert(!_changeTracker);
     [super retry];
+
+    [self asyncTasksFinished: 1];
 }
 
 
