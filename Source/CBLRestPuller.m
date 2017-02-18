@@ -167,11 +167,17 @@
 
 
 - (void) retry {
+    // Start an async task to make sure the replicator doesn't go offline after
+    // stopping the change tracker.
+    [self asyncTaskStarted];
+
     // This is called if I've gone idle but some revisions failed to be pulled.
     // I should start the _changes feed over again, so I can retry all the revisions.
     [_changeTracker stop];
     Assert(!_changeTracker);
     [super retry];
+
+    [self asyncTasksFinished: 1];
 }
 
 
@@ -197,7 +203,6 @@
 
 - (BOOL) goOffline {
     if (![super goOffline]) {
-        Assert(!_changeTracker);
         return NO;
     }
     [_changeTracker stop];
@@ -516,7 +521,7 @@
               if (first) {
                   first = NO;
                   LogTo(SyncPerf, @"%@: Received first revision from bulk-get (%.3f sec)",
-                        self, CFAbsoluteTimeGetCurrent()-start);
+                        strongSelf, CFAbsoluteTimeGetCurrent()-start);
               }
               // Find the matching revision in 'remainingRevs' and get its sequence:
               CBL_Revision* rev;
@@ -526,14 +531,14 @@
                   NSString* docID = $castIf(NSString, props[@"id"]);
                   CBL_RevID* revID = $castIf(NSString, props[@"rev"]).cbl_asRevID;
                   if (!docID || !revID) {
-                      Warn(@"%@: Received invalid rev; ignoring: %@", self, props);
+                      Warn(@"%@: Received invalid rev; ignoring: %@", strongSelf, props);
                       return;
                   }
                   rev = [[CBL_Revision alloc] initWithDocID: docID revID: revID deleted: NO];
               }
               NSUInteger pos = [remainingRevs indexOfObject: rev];
               if (pos == NSNotFound) {
-                  Warn(@"%@: Received unexpected rev %@; ignoring", self, rev);
+                  Warn(@"%@: Received unexpected rev %@; ignoring", strongSelf, rev);
                   return;
               }
               rev.sequence = [remainingRevs[pos] sequence];
@@ -553,14 +558,14 @@
               __strong CBLRestPuller *strongSelf = weakSelf;
               if (!strongSelf) return; // already dealloced
               LogTo(SyncPerf, @"%@: finished bulk-getting %u remote revisions (%.3f sec)",
-                    self, (unsigned)nRevs, CFAbsoluteTimeGetCurrent()-start);
+                    strongSelf, (unsigned)nRevs, CFAbsoluteTimeGetCurrent()-start);
 
               if (error) {
                   strongSelf.error = error;
                   [strongSelf revisionFailed];
               } else if (remainingRevs.count > 0) {
                   Warn(@"%@: %u revs not returned from _bulk_get: %@",
-                       self, (unsigned)remainingRevs.count, remainingRevs);
+                       strongSelf, (unsigned)remainingRevs.count, remainingRevs);
               }
               strongSelf.changesProcessed += remainingRevs.count;
               
@@ -796,7 +801,7 @@
                       if (strongSelf->_running && !strongSelf->_online) {
                           // I've gone offline, so save the tasks for later:
                           [task.progress setIndeterminate];
-                          [self addToWaitingAttachments: task];
+                          [strongSelf addToWaitingAttachments: task];
                       } else {
                           // Otherwise give up:
                           [task.progress failedWithError: error];
