@@ -21,4 +21,5 @@
 	url = https://github.com/couchbaselabs/fmdb.git
 [submodule "vendor/BLIP"]
 	path = vendor/BLIP
-	url = https://github.com/couchbaselabs/BLIP-Cocoa.git
+	url = https://github.com/tophatch/BLIP-Cocoa.git
+	branch = concepts/validateservertrust_crash_1.4
